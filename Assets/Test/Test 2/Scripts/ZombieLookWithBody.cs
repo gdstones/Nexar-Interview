@@ -1,12 +1,12 @@
 using UnityEngine;
-using UnityEngine.UI;
 
-public class ZombieLook : MonoBehaviour
+public class ZombieLookWithBody : MonoBehaviour
 {
     public Transform[] targets;
     public float lookRange = 10f;
     public float lookAngle = 60f;
-    public Image progressImage;
+    public Transform head;
+    public Transform body;
     private Transform nearestTarget;
 
     void Update()
@@ -44,6 +44,10 @@ public class ZombieLook : MonoBehaviour
     {
         Vector3 direction = target.position - transform.position;
         Quaternion lookRotation = Quaternion.LookRotation(direction);
-        transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 2f);
+
+        head.rotation = Quaternion.Slerp(head.rotation, lookRotation, Time.deltaTime * 2f);
+
+        Quaternion bodyRotation = Quaternion.Euler(0, lookRotation.eulerAngles.y, 0);
+        body.rotation = Quaternion.Slerp(body.rotation, bodyRotation, Time.deltaTime * 2f);
     }
 }
