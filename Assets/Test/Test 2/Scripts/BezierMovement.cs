@@ -6,8 +6,9 @@ public class BezierMovement : MonoBehaviour
 {
     public Transform p1, p2, p3, p4;
     [Range(1f, 30f)]  public float speed;
-    private float t = 0f;
+    private float _t = 0f;
     public Image progressImage;
+    public Animator _animator;
 
     private Vector3 _startPos;
     private float _timeCoefficient;
@@ -15,17 +16,23 @@ public class BezierMovement : MonoBehaviour
     private void Start()
     {
         _startPos = transform.position;
+        _animator.Play("zombie_idle");
     }
 
     void Update()
     {
         _timeCoefficient = speed / 30f;
 
-        if (t < 1f)
+        if (_t < 1f)
         {
-            t += Time.deltaTime * _timeCoefficient;
-            transform.position = CalculateBezierPoint(t, p1.position, p2.position, p3.position, p4.position);
-            progressImage.fillAmount = t; // assuming the progressImage is of type Image and using fillAmount to show progress
+            _animator.Play("zombie_walk");
+            _t += Time.deltaTime * _timeCoefficient;
+            transform.position = CalculateBezierPoint(_t, p1.position, p2.position, p3.position, p4.position);
+            progressImage.fillAmount = _t; // assuming the progressImage is of type Image and using fillAmount to show progress
+        }
+        else
+        {
+            _animator.Play("zombie_idle");
         }
 
         if (Input.GetKeyDown(KeyCode.Q))
@@ -37,10 +44,10 @@ public class BezierMovement : MonoBehaviour
     void ResetPosition()
     {
         transform.position = _startPos;
-        t = 0;
+        _t = 0;
     }
 
-    //https://vi.wikipedia.org/wiki/%C4%90%C6%B0%E1%BB%9Dng_cong_B%C3%A9zier
+    // https://en.wikipedia.org/wiki/B%C3%A9zier_curve
     Vector3 CalculateBezierPoint(float t, Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3)
     {
         float u = 1 - t;

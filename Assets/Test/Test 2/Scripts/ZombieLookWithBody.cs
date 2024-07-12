@@ -7,15 +7,21 @@ public class ZombieLookWithBody : MonoBehaviour
     public float lookAngle = 60f;
     public Transform head;
     public Transform body;
-    private Transform nearestTarget;
+    private Transform _nearestTarget;
+    public bool allowBodyRotation = true; 
 
     void Update()
     {
-        nearestTarget = FindNearestTarget();
+        _nearestTarget = FindNearestTarget();
 
-        if (nearestTarget != null)
+        if (_nearestTarget != null)
         {
-            LookAtTarget(nearestTarget);
+            LookAtHead(_nearestTarget);
+
+            if (allowBodyRotation)
+            {
+                LookAtBody(_nearestTarget);
+            }
         }
     }
 
@@ -40,12 +46,18 @@ public class ZombieLookWithBody : MonoBehaviour
         return nearest;
     }
 
-    void LookAtTarget(Transform target)
+    void LookAtHead(Transform target)
     {
-        Vector3 direction = target.position - transform.position;
+        Vector3 direction = target.position - head.position;
         Quaternion lookRotation = Quaternion.LookRotation(direction);
 
         head.rotation = Quaternion.Slerp(head.rotation, lookRotation, Time.deltaTime * 2f);
+    }
+
+    void LookAtBody(Transform target)
+    {
+        Vector3 direction = target.position - transform.position;
+        Quaternion lookRotation = Quaternion.LookRotation(direction);
 
         Quaternion bodyRotation = Quaternion.Euler(0, lookRotation.eulerAngles.y, 0);
         body.rotation = Quaternion.Slerp(body.rotation, bodyRotation, Time.deltaTime * 2f);

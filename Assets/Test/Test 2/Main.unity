@@ -1552,6 +1552,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1061831013}
   - component: {fileID: 1061831012}
+  - component: {fileID: 1061831014}
   m_Layer: 0
   m_Name: Zombie
   m_TagString: Untagged
@@ -1577,6 +1578,7 @@ MonoBehaviour:
   p4: {fileID: 1020075002}
   speed: 1.5
   progressImage: {fileID: 1139585188}
+  _animator: {fileID: 5866666021412457001}
 --- !u!4 &1061831013
 Transform:
   m_ObjectHideFlags: 0
@@ -1593,6 +1595,52 @@ Transform:
   - {fileID: 543450653106180179}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1061831014
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1061831011}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9899c16f0778f0545a85edde49c29d06, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targets:
+  - {fileID: 1620066468}
+  - {fileID: 1132609306}
+  - {fileID: 1480333355}
+  - {fileID: 1508059820}
+  - {fileID: 168109709}
+  - {fileID: 1487430078}
+  - {fileID: 6301643}
+  - {fileID: 1832370272}
+  - {fileID: 1252199320}
+  - {fileID: 1432464958}
+  - {fileID: 670648420}
+  - {fileID: 1199315438}
+  - {fileID: 1229636325}
+  - {fileID: 745259050}
+  - {fileID: 1514619982}
+  - {fileID: 2137926363}
+  - {fileID: 52218644}
+  - {fileID: 1513459178}
+  - {fileID: 656430488}
+  - {fileID: 2050021334}
+  - {fileID: 1012704658}
+  - {fileID: 935941183}
+  - {fileID: 651124805}
+  - {fileID: 1355992833}
+  - {fileID: 328405440}
+  - {fileID: 1764693781}
+  - {fileID: 681299473}
+  - {fileID: 1362249236}
+  lookRange: 10
+  lookAngle: 60
+  head: {fileID: 8793045219315168516}
+  body: {fileID: 8948942431787870134}
+  allowBodyRotation: 1
 --- !u!1 &1106559250
 GameObject:
   m_ObjectHideFlags: 0
@@ -1723,7 +1771,7 @@ GameObject:
   - component: {fileID: 1139585189}
   - component: {fileID: 1139585188}
   m_Layer: 5
-  m_Name: progress
+  m_Name: Progress
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
