@@ -2,13 +2,15 @@ using UnityEngine;
 
 public class ZombieLookWithBody : MonoBehaviour
 {
+    public BezierMovement bezierMovement;
     public Transform[] targets;
     public float lookRange = 10f;
     public float lookAngle = 60f;
     public Transform head;
     public Transform body;
+    public Transform rigMain;
     private Transform _nearestTarget;
-    public bool allowBodyRotation = true; 
+    public bool allowBodyRotation = true;
 
     void Update()
     {
@@ -23,6 +25,21 @@ public class ZombieLookWithBody : MonoBehaviour
                 LookAtBody(_nearestTarget);
             }
         }
+        else
+        {
+
+        }
+
+        if (!bezierMovement.hasReachedDestination)
+        {
+            Quaternion lookRotation = Quaternion.LookRotation(bezierMovement.GetBezierDirection());
+            rigMain.rotation = Quaternion.Euler(0, lookRotation.eulerAngles.y, 0);
+        }
+        else
+        {
+            Quaternion targetRotation = Quaternion.Euler(0, 0, 0);
+            rigMain.rotation = Quaternion.Slerp(rigMain.rotation, targetRotation, Time.deltaTime * 2f);
+        }
     }
 
     Transform FindNearestTarget()
@@ -36,7 +53,7 @@ public class ZombieLookWithBody : MonoBehaviour
             Vector3 directionToTarget = target.position - transform.position;
             float angle = Vector3.Angle(transform.forward, directionToTarget);
 
-            if (distance < lookRange && angle < lookAngle / 2 && distance < nearestDistance)
+            if (distance < lookRange && angle < lookAngle && distance < nearestDistance)
             {
                 nearest = target;
                 nearestDistance = distance;
