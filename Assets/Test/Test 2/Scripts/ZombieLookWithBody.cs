@@ -1,45 +1,46 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class ZombieLookWithBody : MonoBehaviour
 {
     public BezierMovement bezierMovement;
-    public Transform[] targets;
-    public float lookRange = 10f;
-    public float lookAngle = 60f;
-    public Transform head;
-    public Transform body;
-    public Transform rigMain;
-    private Transform _nearestTarget;
-    public bool allowBodyRotation = true;
+    public Transform[] points;            // Array of points to look at
+    public Transform rigMain;             // Rotate the whole body
+    public Transform target;              // The goal is to let your head and chest rotate as you move
+    public float lookRange = 10f;         // Maximum range to look for targets
+    public float lookAngle = 60f;         // Maximum angle to look for targets
+    private Transform _nextNearestTarget; // The next nearest target
+    private Vector3 _offset;
+    private Vector3 _next;
+
+    private void Start()
+    {
+        // The purpose is so that the zombie's head does not have to look up
+        _offset = new Vector3(0, 0.2f, 0);
+    }
+
 
     void Update()
     {
-        _nearestTarget = FindNearestTarget();
+        _nextNearestTarget = FindNearestTarget();
 
-        if (_nearestTarget != null)
+        // If a nearest target is found, interpolate towards its position
+        if (_nextNearestTarget != null)
         {
-            LookAtHead(_nearestTarget);
-
-            if (allowBodyRotation)
-            {
-                LookAtBody(_nearestTarget);
-            }
+            _next = _nextNearestTarget.position - _offset;
+            target.position = Vector3.Lerp(target.position, _next, Time.deltaTime);
         }
         else
         {
-
+            target.position = Vector3.Lerp(target.position, bezierMovement.GetBezierDirection(), Time.deltaTime);
+            Debug.Log("111111");
         }
 
-        if (!bezierMovement.hasReachedDestination)
-        {
-            Quaternion lookRotation = Quaternion.LookRotation(bezierMovement.GetBezierDirection());
-            rigMain.rotation = Quaternion.Euler(0, lookRotation.eulerAngles.y, 0);
-        }
-        else
-        {
-            Quaternion targetRotation = Quaternion.Euler(0, 0, 0);
-            rigMain.rotation = Quaternion.Slerp(rigMain.rotation, targetRotation, Time.deltaTime * 2f);
-        }
+        // Rotate the rig towards the direction of the Bezier movement
+        Quaternion lookRotation = bezierMovement.hasReachedDestination
+            ? Quaternion.Euler(0, 0, 0)
+            : Quaternion.LookRotation(bezierMovement.GetBezierDirection());
+
+        rigMain.rotation = Quaternion.RotateTowards(rigMain.rotation, lookRotation, Time.deltaTime * 100f);
     }
 
     Transform FindNearestTarget()
@@ -47,36 +48,20 @@ public class ZombieLookWithBody : MonoBehaviour
         Transform nearest = null;
         float nearestDistance = float.MaxValue;
 
-        foreach (var target in targets)
+        // Iterate through all points to find the nearest one within range and angle
+        foreach (var point in points)
         {
-            float distance = Vector3.Distance(transform.position, target.position);
-            Vector3 directionToTarget = target.position - transform.position;
+            float distance = Vector3.Distance(transform.position, point.position);
+            Vector3 directionToTarget = point.position - transform.position;
             float angle = Vector3.Angle(transform.forward, directionToTarget);
 
             if (distance < lookRange && angle < lookAngle && distance < nearestDistance)
             {
-                nearest = target;
+                nearest = point;
                 nearestDistance = distance;
             }
         }
 
         return nearest;
-    }
-
-    void LookAtHead(Transform target)
-    {
-        Vector3 direction = target.position - head.position;
-        Quaternion lookRotation = Quaternion.LookRotation(direction);
-
-        head.rotation = Quaternion.Slerp(head.rotation, lookRotation, Time.deltaTime * 2f);
-    }
-
-    void LookAtBody(Transform target)
-    {
-        Vector3 direction = target.position - transform.position;
-        Quaternion lookRotation = Quaternion.LookRotation(direction);
-
-        Quaternion bodyRotation = Quaternion.Euler(0, lookRotation.eulerAngles.y, 0);
-        body.rotation = Quaternion.Slerp(body.rotation, bodyRotation, Time.deltaTime * 2f);
     }
 }

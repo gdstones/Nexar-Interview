@@ -6,14 +6,14 @@ public class BezierMovement : MonoBehaviour
     public Transform p1, p2, p3, p4;
     public Image progressImage;
     public Animator animator;
-    [Range(0.1f, 100f)]
+    public KeyCode resetPos;
+    [Range(0f, 100f)]
     public float speed;
     public bool hasReachedDestination;
 
     private float _t = 0f;
     private Vector3 _startPos;
     private Vector3 _directionDefault;
-
     private float _bezierLength;
     private float _normalizedSpeed;
 
@@ -21,38 +21,46 @@ public class BezierMovement : MonoBehaviour
     {
         animator.Play("zombie_idle");
         _startPos = transform.position;
-        _bezierLength = CalculateBezierLength(200);
+        _bezierLength = CalculateBezierLength();
         _normalizedSpeed = speed / _bezierLength;
     }
 
-    void Update()
+    void FixedUpdate()
     {
         _normalizedSpeed = speed / _bezierLength;
 
         if (_t < 1f)
         {
-            animator.Play("zombie_walk");
-            _t += Time.deltaTime * _normalizedSpeed;
-            _t = Mathf.Clamp01(_t);  // Ensure _t doesn't exceed 1
+            _t += Time.fixedDeltaTime * _normalizedSpeed;
+            _t = Mathf.Clamp01(_t);
 
             Vector3 currentPos = CalculateBezierPoint(_t, p1.position, p2.position, p3.position, p4.position);
             transform.position = currentPos;
 
-            Vector3 nextPos = CalculateBezierPoint(Mathf.Min(_t + Time.deltaTime * _normalizedSpeed, 1f),
-                                p1.position, p2.position, p3.position, p4.position);
+            Vector3 nextPos = CalculateBezierPoint(Mathf.Min(_t + Time.fixedDeltaTime * _normalizedSpeed, 1f), 
+                                    p1.position, p2.position, p3.position, p4.position);
             _directionDefault = (nextPos - currentPos).normalized;
 
             progressImage.fillAmount = _t;
+        }
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(resetPos))
+        {
+            ResetPosition();
+        }
+
+        if (_t < 1f)
+        {
+            animator.Play("zombie_walk");
         }
         else
         {
             animator.Play("zombie_idle");
             hasReachedDestination = true;
-        }
-
-        if (Input.GetKeyDown(KeyCode.Q))
-        {
-            ResetPosition();
+            _directionDefault = Vector3.zero;
         }
     }
 
